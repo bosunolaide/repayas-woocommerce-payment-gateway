@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Repayas Payments Gateway
+ * Plugin Name: Repayas Payment Gateway
  * Plugin URI: https://inovidia.com
- * Author: Techiepress
+ * Author: Inovidia
  * Author URI: https://inovidia.com
  * Description: Online Payment System for Merchants.
  * Version: 0.1.0
@@ -22,8 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
 
 add_action( 'plugins_loaded', 'repayas_payment_init', 11 );
-add_filter( 'woocommerce_currencies', 'techiepress_add_gbp_currencies' );
-add_filter( 'woocommerce_currency_symbol', 'techiepress_add_gbp_currencies_symbol', 10, 2 );
+add_filter( 'woocommerce_currencies', 'inovidia_add_gbp_currencies' );
+add_filter( 'woocommerce_currency_symbol', 'inovidia_add_gbp_currencies_symbol', 10, 2 );
 add_filter( 'woocommerce_payment_gateways', 'add_to_woo_repayas_payment_gateway');
 
 function repayas_payment_init() {
@@ -39,12 +39,12 @@ function add_to_woo_repayas_payment_gateway( $gateways ) {
     return $gateways;
 }
 
-function techiepress_add_gbp_currencies( $currencies ) {
+function inovidia_add_gbp_currencies( $currencies ) {
 	$currencies['GBP'] = __( 'Great British Pounds', 'repayas-payments-woo' );
 	return $currencies;
 }
 
-function techiepress_add_gbp_currencies_symbol( $currency_symbol, $currency ) {
+function inovidia_add_gbp_currencies_symbol( $currency_symbol, $currency ) {
 	switch ( $currency ) {
 		case 'GBP': 
 			$currency_symbol = 'GBP'; 
