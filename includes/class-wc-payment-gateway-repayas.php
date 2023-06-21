@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Repayas Mobile Payments Gateway.
+ * Repayas Payment Gateway.
  *
- * Provides a Repayas Mobile Payments Payment Gateway.
+ * Provides a Repayas Payment Gateway.
  *
  * @class       WC_Gateway_Repayas
  * @extends     WC_Payment_Gateway
@@ -46,7 +46,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 	protected function setup_properties() {
 		$this->id                 = 'repayas';
 		$this->icon               = apply_filters( 'woocommerce_repayas_icon', plugins_url('../assets/icon.png', __FILE__ ) );
-		$this->method_title       = __( 'Repayas Mobile Payments', 'repayas-payments-woo' );
+		$this->method_title       = __( 'Repayas', 'repayas-payments-woo' );
 		$this->api_key            = __( 'Add API Key', 'repayas-payments-woo' );
 		$this->widget_id          = __( 'Add Widget ID', 'repayas-payments-woo' );
 		$this->method_description = __( 'Have your customers pay with Repayas.', 'repayas-payments-woo' );
