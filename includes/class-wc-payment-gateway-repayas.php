@@ -26,8 +26,13 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		// Get settings.
 		$this->title              = $this->get_option( 'title' );
 		$this->description        = $this->get_option( 'description' );
-		$this->api_key            = $this->get_option( 'api_key' );
-		$this->widget_id          = $this->get_option( 'widget_id' );
+		$this->public_key         = $this->get_option( 'public_key' );
+		$this->secret_key         = $this->get_option( 'secret_key' );
+		$this->ipn_url            = $this->get_option( 'ipn_url' );
+		$this->success_url        = $this->get_option( 'success_url' );
+		$this->cancel_url         = $this->get_option( 'cancel_url' );
+		$this->site_name          = $this->get_option( 'site_name' );
+		$this->site_logo          = $this->get_option( 'site_logo' );
 		$this->instructions       = $this->get_option( 'instructions' );
 		$this->enable_for_methods = $this->get_option( 'enable_for_methods', array() );
 		$this->enable_for_virtual = $this->get_option( 'enable_for_virtual', 'yes' ) === 'yes';
@@ -47,8 +52,8 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		$this->id                 = 'repayas';
 		$this->icon               = apply_filters( 'woocommerce_repayas_icon', plugins_url('../assets/icon.png', __FILE__ ) );
 		$this->method_title       = __( 'Repayas', 'repayas-payments-woo' );
-		$this->api_key            = __( 'Add API Key', 'repayas-payments-woo' );
-		$this->widget_id          = __( 'Add Widget ID', 'repayas-payments-woo' );
+		$this->public_key         = __( 'Add API Public Key', 'repayas-payments-woo' );
+		$this->secret_key         = __( 'Add API Secret Key', 'repayas-payments-woo' );
 		$this->method_description = __( 'Have your customers pay with Repayas.', 'repayas-payments-woo' );
 		$this->has_fields         = false;
 	}
@@ -72,16 +77,16 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 				'default'     => __( 'Repayas', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
-			'api_key'             => array(
-				'title'       => __( 'API Key', 'repayas-payments-woo' ),
+			'public_key'             => array(
+				'title'       => __( 'Public Key', 'repayas-payments-woo' ),
 				'type'        => 'text',
-				'description' => __( 'Add your API key', 'repayas-payments-woo' ),
+				'description' => __( 'Add your API public key', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
-			'widget_id'           => array(
-				'title'       => __( 'Widget ID', 'repayas-payments-woo' ),
+			'secret_key'           => array(
+				'title'       => __( 'Secret Key', 'repayas-payments-woo' ),
 				'type'        => 'text',
-				'description' => __( 'Add your Widget key', 'repayas-payments-woo' ),
+				'description' => __( 'Add your API secret key', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
 			'description'        => array(

@@ -19,10 +19,40 @@ function inovidia_repayas_description_fields( $description, $payment_id ) {
     
 
     woocommerce_form_field(
-        'payment_number',
+        'customer.first_name',
         array(
             'type' => 'text',
-            'label' =>__( 'Payment Phone Number', 'repayas-payments-woo' ),
+            'label' =>__( 'Customer First Name', 'repayas-payments-woo' ),
+            'class' => array( 'form-row', 'form-row-wide' ),
+            'required' => true,
+        )
+    );
+
+    woocommerce_form_field(
+        'customer.last_name',
+        array(
+            'type' => 'text',
+            'label' =>__( 'Customer Last Name', 'repayas-payments-woo' ),
+            'class' => array( 'form-row', 'form-row-wide' ),
+            'required' => true,
+        )
+    );
+
+    woocommerce_form_field(
+        'customer.email',
+        array(
+            'type' => 'text',
+            'label' =>__( 'Customer Email', 'repayas-payments-woo' ),
+            'class' => array( 'form-row', 'form-row-wide' ),
+            'required' => true,
+        )
+    );
+
+    woocommerce_form_field(
+        'customer.mobile',
+        array(
+            'type' => 'text',
+            'label' =>__( 'Customer Mobile', 'repayas-payments-woo' ),
             'class' => array( 'form-row', 'form-row-wide' ),
             'required' => true,
         )
