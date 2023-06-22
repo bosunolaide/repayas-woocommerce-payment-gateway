@@ -63,47 +63,77 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 	 */
 	public function init_form_fields() {
 		$this->form_fields = array(
-			'enabled'            => array(
+			'enabled'         	=> array(
 				'title'       => __( 'Enable/Disable', 'repayas-payments-woo' ),
 				'label'       => __( 'Enable Repayas', 'repayas-payments-woo' ),
 				'type'        => 'checkbox',
 				'description' => '',
 				'default'     => 'no',
 			),
-			'title'              => array(
+			'title'           	=> array(
 				'title'       => __( 'Title', 'repayas-payments-woo' ),
 				'type'        => 'text',
 				'description' => __( 'Repayas Payment method description that the customer will see on your checkout.', 'repayas-payments-woo' ),
 				'default'     => __( 'Repayas', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
-			'public_key'             => array(
+			'public_key'      	=> array(
 				'title'       => __( 'Public Key', 'repayas-payments-woo' ),
 				'type'        => 'text',
 				'description' => __( 'Add your API public key', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
-			'secret_key'           => array(
+			'secret_key'      	=> array(
 				'title'       => __( 'Secret Key', 'repayas-payments-woo' ),
 				'type'        => 'text',
 				'description' => __( 'Add your API secret key', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
-			'description'        => array(
+			'ipn_url'         	=> array(
+				'title'       => __( 'Instant Payment Notification', 'repayas-payments-woo' ),
+				'type'        => 'text',
+				'description' => __( 'Add your Instant Payment Notification URL', 'repayas-payments-woo' ),
+				'desc_tip'    => true,
+			),
+			'success_url'     	=> array(
+				'title'       => __( 'Success URL', 'repayas-payments-woo' ),
+				'type'        => 'text',
+				'description' => __( 'Add your Payment Success redirect url', 'repayas-payments-woo' ),
+				'desc_tip'    => true,
+			),
+			'cancel_url'     	=> array(
+				'title'       => __( 'Cancel URL', 'repayas-payments-woo' ),
+				'type'        => 'text',
+				'description' => __( 'Add your Payment Cancel redirect url', 'repayas-payments-woo' ),
+				'desc_tip'    => true,
+			),
+			'site_name'     	=> array(
+				'title'       => __( 'Site Name', 'repayas-payments-woo' ),
+				'type'        => 'text',
+				'description' => __( 'Add your Site Name', 'repayas-payments-woo' ),
+				'desc_tip'    => true,
+			),
+			'site_logo'     	=> array(
+				'title'       => __( 'Site Logo', 'repayas-payments-woo' ),
+				'type'        => 'text',
+				'description' => __( 'Add your Site Logo', 'repayas-payments-woo' ),
+				'desc_tip'    => true,
+			),
+			'description'     	=> array(
 				'title'       => __( 'Description', 'repayas-payments-woo' ),
 				'type'        => 'textarea',
 				'description' => __( 'Repayas Payment method description that the customer will see on your website.', 'repayas-payments-woo' ),
 				'default'     => __( 'Repayas Payment before delivery.', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
-			'instructions'       => array(
+			'instructions'    	=> array(
 				'title'       => __( 'Instructions', 'repayas-payments-woo' ),
 				'type'        => 'textarea',
 				'description' => __( 'Instructions that will be added to the thank you page.', 'repayas-payments-woo' ),
 				'default'     => __( 'Repayas Payment before delivery.', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
-			'enable_for_methods' => array(
+			'enable_for_methods' 	=> array(
 				'title'             => __( 'Enable for shipping methods', 'repayas-payments-woo' ),
 				'type'              => 'multiselect',
 				'class'             => 'wc-enhanced-select',
@@ -116,7 +146,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 					'data-placeholder' => __( 'Select shipping methods', 'repayas-payments-woo' ),
 				),
 			),
-			'enable_for_virtual' => array(
+			'enable_for_virtual' 	=> array(
 				'title'   => __( 'Accept for virtual orders', 'repayas-payments-woo' ),
 				'label'   => __( 'Accept repayas if the order is virtual', 'repayas-payments-woo' ),
 				'type'    => 'checkbox',
