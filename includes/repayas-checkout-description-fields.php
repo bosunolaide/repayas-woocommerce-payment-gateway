@@ -22,7 +22,7 @@ function inovidia_repayas_description_fields( $description, $payment_id ) {
         'customer.first_name',
         array(
             'type' => 'text',
-            'label' =>__( 'Customer First Name', 'repayas-payments-woo' ),
+            'label' =>__( 'First Name', 'repayas-payments-woo' ),
             'class' => array( 'form-row', 'form-row-wide' ),
             'required' => true,
         )
@@ -32,7 +32,7 @@ function inovidia_repayas_description_fields( $description, $payment_id ) {
         'customer.last_name',
         array(
             'type' => 'text',
-            'label' =>__( 'Customer Last Name', 'repayas-payments-woo' ),
+            'label' =>__( 'Last Name', 'repayas-payments-woo' ),
             'class' => array( 'form-row', 'form-row-wide' ),
             'required' => true,
         )
@@ -42,7 +42,7 @@ function inovidia_repayas_description_fields( $description, $payment_id ) {
         'customer.email',
         array(
             'type' => 'text',
-            'label' =>__( 'Customer Email', 'repayas-payments-woo' ),
+            'label' =>__( 'Email', 'repayas-payments-woo' ),
             'class' => array( 'form-row', 'form-row-wide' ),
             'required' => true,
         )
@@ -52,26 +52,13 @@ function inovidia_repayas_description_fields( $description, $payment_id ) {
         'customer.mobile',
         array(
             'type' => 'text',
-            'label' =>__( 'Customer Mobile', 'repayas-payments-woo' ),
+            'label' =>__( 'Phone Number', 'repayas-payments-woo' ),
             'class' => array( 'form-row', 'form-row-wide' ),
             'required' => true,
         )
     );
 
-    woocommerce_form_field(
-        'paying_network',
-        array(
-            'type' => 'select',
-            'label' => __( 'Payment Network', 'repayas-payments-woo' ),
-            'class' => array( 'form-row', 'form-row-wide' ),
-            'required' => true,
-            'options' => array(
-                'none' => __( 'Select Phone Network', 'repayas-payments-woo' ),
-                'mtn_mobile' => __( 'MTN Mobile Money', 'repayas-payments-woo' ),
-                'airtel_money' => __( 'Airtel Money', 'repayas-payments-woo' ),
-            ),
-        )
-    );
+
 
     echo '</div>';
 
@@ -81,21 +68,51 @@ function inovidia_repayas_description_fields( $description, $payment_id ) {
 }
 
 function inovidia_repayas_description_fields_validation() {
-    if( 'repayas' === $_POST['payment_method'] && ! isset( $_POST['payment_number'] )  || empty( $_POST['payment_number'] ) ) {
-        wc_add_notice( 'Please enter a number that is to be billed', 'error' );
+    if( 'repayas' === $_POST['payment_method'] && ! isset( $_POST['customer.first_name'] )  || empty( $_POST['customer.first_name'] ) ) {
+        wc_add_notice( 'Please enter your first name', 'error' );
+    }
+
+    if( 'repayas' === $_POST['payment_method'] && ! isset( $_POST['customer.last_name'] )  || empty( $_POST['customer.last_name'] ) ) {
+        wc_add_notice( 'Please enter your last name', 'error' );
+    }
+
+    if( 'repayas' === $_POST['payment_method'] && ! isset( $_POST['customer.email'] )  || empty( $_POST['customer.email'] ) ) {
+        wc_add_notice( 'Please enter your email', 'error' );
+    }
+
+    if( 'repayas' === $_POST['payment_method'] && ! isset( $_POST['customer.mobile'] )  || empty( $_POST['customer.mobile'] ) ) {
+        wc_add_notice( 'Please enter your phone number', 'error' );
     }
 }
 
 function inovidia_checkout_update_order_meta( $order_id ) {
-    if( isset( $_POST['payment_number'] ) || ! empty( $_POST['payment_number'] ) ) {
-       update_post_meta( $order_id, 'payment_number', $_POST['payment_number'] );
+    if( isset( $_POST['customer.first_name'] ) || ! empty( $_POST['customer.first_name'] ) ) {
+       update_post_meta( $order_id, 'customer.first_name', $_POST['customer.first_name'] );
+    }
+
+    if( isset( $_POST['customer.last_name'] ) || ! empty( $_POST['customer.last_name'] ) ) {
+        update_post_meta( $order_id, 'customer.last_name', $_POST['customer.last_name'] );
+    }
+
+    if( isset( $_POST['customer.email'] ) || ! empty( $_POST['customer.email'] ) ) {
+        update_post_meta( $order_id, 'customer.email', $_POST['customer.email'] );
+    }
+
+    if( isset( $_POST['customer.mobile'] ) || ! empty( $_POST['customer.mobile'] ) ) {
+        update_post_meta( $order_id, 'customer.mobile', $_POST['customer.mobile'] );
     }
 }
 
 function inovidia_order_data_after_billing_address( $order ) {
-    echo '<p><strong>' . __( 'Payment Phone Number:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'payment_number', true ) . '</p>';
+    echo '<p><strong>' . __( 'First Name:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'customer.first_name', true ) . '</p>';
+    echo '<p><strong>' . __( 'Last Name:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'customer.last_name', true ) . '</p>';
+    echo '<p><strong>' . __( 'Email:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'customer.email', true ) . '</p>';
+    echo '<p><strong>' . __( 'Phone Number:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'customer.mobile', true ) . '</p>';
 }
 
 function inovidia_order_item_meta_end( $item_id, $item, $order ) {
-    echo '<p><strong>' . __( 'Payment Phone Number:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'payment_number', true ) . '</p>';
+    echo '<p><strong>' . __( 'First Name:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'customer.first_name', true ) . '</p>';
+    echo '<p><strong>' . __( 'Last Name:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'customer.last_name', true ) . '</p>';
+    echo '<p><strong>' . __( 'Email:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'customer.email', true ) . '</p>';
+    echo '<p><strong>' . __( 'Phone Number:', 'repayas-payments-woo' ) . '</strong><br>' . get_post_meta( $order->get_id(), 'customer.mobile', true ) . '</p>';
 }
