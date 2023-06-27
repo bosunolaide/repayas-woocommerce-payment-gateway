@@ -372,6 +372,8 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 
 		$details = $order->get_items();
 
+		$first_name = $_POST['payment_number']
+
 
 		$parameters = [
 			'identifier' => $identifier,
