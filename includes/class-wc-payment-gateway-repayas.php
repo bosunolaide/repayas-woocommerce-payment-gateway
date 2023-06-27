@@ -115,9 +115,9 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 			),
 			'site_logo'     	=> array(
 				'title'       => __( 'Site Logo', 'repayas-payments-woo' ),
-				'type'        => 'text',
+				'type'        => 'file',
 				'description' => __( 'Add your Site Logo', 'repayas-payments-woo' ),
-				'desc_tip'    => true,
+				'desc_tip'    => false,
 			),
 			'description'     	=> array(
 				'title'       => __( 'Description', 'repayas-payments-woo' ),
@@ -361,8 +361,66 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 
 	private function repayas_payment_processing( $order ) {
 
-		$total = intval( $order->get_total() );
-		var_dump($total);
+		$identifier = strval( $order->get_id() );
+		var_dump($identifier)
+
+		$currency = strval( $order->get_currency() );
+		var_dump($currency);
+
+		$amount = intval( $order->get_total() );
+		var_dump($amount);
+
+		$details = $order->get_items();
+
+
+		$parameters = [
+			'identifier' => $identifier,
+			'currency' => $currency,
+			'amount' => $amount,
+			'gateway_methods' => [
+				// Please write the name of the gateway method you want to use
+			],
+			'details' => $details,
+			'ipn_url' => $this->ipn_url,
+			'cancel_url' => $this->cancel_url,
+			'success_url' => $this->success_url,
+			'public_key' => $this->public_key,
+			'site_name' => $this->site_name,
+			'site_logo' => $this->site_logo,
+			'checkout_theme' => 'light',
+			'customer'=>[
+				'first_name'=>'John',
+				'last_name'=>'Doe',
+				'email'=>'joan@gmail.com',
+				'mobile'=>'12345789',
+			],
+			'shipping_info'=>[
+				'address_one'=>'',
+				'address_two'=>'',
+				'area'=>'',
+				'city'=>'',
+				'sub_city'=>'',
+				'state'=>'',
+				'postcode'=>'',
+				'country'=>'',
+				'others'=>'',
+			],
+			'billing_info'=>[
+				'address_one'=>'',
+				'address_two'=>'',
+				'area'=>'',
+				'city'=>'',
+				'sub_city'=>'',
+				'state'=>'',
+				'postcode'=>'',
+				'country'=>'',
+				'others'=>'',
+			]
+		];
+
+
+
+
 
 		$phone = esc_attr( $_POST['payment_number'] );
 		$network_id = '1'; // mtn
