@@ -362,7 +362,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 	private function repayas_payment_processing( $order ) {
 
 		$identifier = strval( $order->get_id() );
-		var_dump($identifier)
+		var_dump($identifier);
 
 		$currency = strval( $order->get_currency() );
 		var_dump($currency);
