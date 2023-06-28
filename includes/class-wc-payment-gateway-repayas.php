@@ -372,10 +372,17 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 
 		$details = $order->get_items();
 
-		$first_name = $_POST['first_name'];
-		$last_name = $_POST['last_name'];
-		$email = $_POST['email'];
-		$mobile = esc_attr( $_POST['mobile'] );
+		$first_name = strval( $order->get_billing_first_name() );
+		var_dump($first_name);
+
+		$last_name = strval( $order->get_billing_last_name() );
+		var_dump($last_name);
+
+		$email = strval( $order->get_billing_email() );
+		var_dump($email);
+
+		$mobile = strval( $order->get_billing_phone() );
+		var_dump($mobile);
 
 
 		$parameters = [
