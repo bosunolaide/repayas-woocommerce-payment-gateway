@@ -372,7 +372,10 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 
 		$details = $order->get_items();
 
-		$first_name = $_POST['payment_number']
+		$first_name = $_POST['first_name'];
+		$last_name = $_POST['last_name'];
+		$email = $_POST['email'];
+		$mobile = esc_attr( $_POST['mobile'] );
 
 
 		$parameters = [
@@ -391,10 +394,10 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 			'site_logo' => $this->site_logo,
 			'checkout_theme' => 'light',
 			'customer'=>[
-				'first_name'=>'John',
-				'last_name'=>'Doe',
-				'email'=>'joan@gmail.com',
-				'mobile'=>'12345789',
+				'first_name'=>$first_name,
+				'last_name'=>$last_name,
+				'email'=>$email,
+				'mobile'=>$mobile,
 			],
 			'shipping_info'=>[
 				'address_one'=>'',
@@ -421,18 +424,21 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		];
 
 
+		//include if condition for changing API URL from test to live.
 
 
 
-		$phone = esc_attr( $_POST['payment_number'] );
-		$network_id = '1'; // mtn
-		$reason = 'Test';
+		$response = wp_remote_post('https://repayas.com/test/payment/initiate', array(
+			'method' => 'POST',
+			'headers' => array(
+				'content-Type' => 'application/json; charset=utf-8'
+			),
+			'httpversion' => '1.0',
+			'sslverify' => false,
+			'body' => json_encode($parameters),
+			'timeout' => 45
+		));
 
-		$url = 'https://e.patasente.com/phantom-api/pay-with-patasente/' . $this->api_key . '/' . $this->widget_id . '?phone=' . $phone . '&amount=' . $total . '&mobile_money_company_id=' . $network_id . '&reason=' . 'Payment for Order: ' .$order_id;
-
-		var_dump($url);
-
-		$response = wp_remote_post( $url, array( 'timeout' => 45 ) );
 
 		if ( is_wp_error( $response ) ) {
 			$error_message = $response->get_error_message();
