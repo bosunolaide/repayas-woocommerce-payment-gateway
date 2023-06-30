@@ -115,8 +115,8 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 			),
 			'site_logo'     	=> array(
 				'title'       => __( 'Site Logo', 'repayas-payments-woo' ),
-				'type'        => 'file',
-				'description' => __( 'Add your Site Logo', 'repayas-payments-woo' ),
+				'type'        => 'url',
+				'description' => __( 'Add your Site Logo URL', 'repayas-payments-woo' ),
 				'desc_tip'    => false,
 			),
 			'description'     	=> array(
@@ -370,19 +370,19 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		$amount = intval( $order->get_total() );
 		var_dump($amount);
 
-		$details = $order->get_items();
+		$first_name = $order->get_billing_first_name();
 
-		$first_name = strval( $order->get_billing_first_name() );
-		var_dump($first_name);
+		$last_name = $order->get_billing_last_name();
 
-		$last_name = strval( $order->get_billing_last_name() );
-		var_dump($last_name);
+		$email = $order->get_billing_email();
 
-		$email = strval( $order->get_billing_email() );
-		var_dump($email);
+		$mobile = $order->get_billing_phone();
 
-		$mobile = strval( $order->get_billing_phone() );
-		var_dump($mobile);
+		foreach ( $order->get_items() as $item_id => $item ) {
+
+		$product_name = $item->get_name();	
+
+		}
 
 
 		$parameters = [
@@ -391,8 +391,9 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 			'amount' => $amount,
 			'gateway_methods' => [
 				// Please write the name of the gateway method you want to use
+				'stripe'
 			],
-			'details' => $details,
+			'details' => $product_name ,
 			'ipn_url' => $this->ipn_url,
 			'cancel_url' => $this->cancel_url,
 			'success_url' => $this->success_url,
@@ -458,8 +459,8 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 
 		if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
 			$response_body = wp_remote_retrieve_body( $response );
-			var_dump($response_body['message']);
-			if ( 'Thank you! Your payment was successful' === $response_body['message'] ) {
+			var_dump($response_body);
+			if ( 'Thank you! Your payment was successful' === $response_body) {
 				$order->payment_complete();
 
 				// Remove cart.
