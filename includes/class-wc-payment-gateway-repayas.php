@@ -40,7 +40,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
 		add_filter( 'woocommerce_payment_complete_order_status', array( $this, 'change_payment_complete_order_status' ), 10, 3 );
-
+		
 		// Customer Emails.
 		add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
 	}
@@ -359,16 +359,20 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		}
 	}
 
+	
+	public function redirect_to_gateway_status() {
+		wp_redirect('/gateway-status.php');
+		exit();
+	}
+
+
 	private function repayas_payment_processing( $order ) {
 
 		$identifier = strval( $order->get_id() );
-		var_dump($identifier);
 
 		$currency = strval( $order->get_currency() );
-		var_dump($currency);
 
 		$amount = intval( $order->get_total() );
-		var_dump($amount);
 
 		$first_name = $order->get_billing_first_name();
 
@@ -435,7 +439,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		//include if condition for changing API URL from test to live.
 
 
-
+		
 		$response = wp_remote_post('https://repayas.com/test/payment/initiate', array(
 			'method' => 'POST',
 			'headers' => array(
@@ -459,7 +463,12 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 
 		if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
 			$response_body = wp_remote_retrieve_body( $response );
-			var_dump($response_body);
+			$response_body_decoded = json_decode($response_body, true);
+			// var_dump($response_body_decoded);
+			$redirect_url = $response_body_decoded['redirect_url'];
+			var_dump($redirect_url);
+			
+			/*
 			if ( 'Thank you! Your payment was successful' === $response_body) {
 				$order->payment_complete();
 
@@ -469,9 +478,9 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 				// Return thankyou redirect.
 				return array(
 					'result'   => 'success',
-					'redirect' => $this->get_return_url( $order ),
+					'redirect' => $this->get_return_url( $order ), 
 				);
-			}
+			} */
 		}
 	}
 
