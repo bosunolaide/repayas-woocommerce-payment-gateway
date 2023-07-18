@@ -456,7 +456,8 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		$response = wp_remote_post('https://repayas.com/test/payment/initiate', array(
 			'method' => 'POST',
 			'headers' => array(
-				'content-Type' => 'application/json; charset=utf-8'
+				'content-Type' => 'application/json; charset=utf-8',
+				'Authorization' => 'Bearer ' . $this->secret_key
 			),
 			'httpversion' => '1.0',
 			'sslverify' => false,
