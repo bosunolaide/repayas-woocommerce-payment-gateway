@@ -410,7 +410,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 			'amount' => $amount,
 			'gateway_methods' => [
 				// Please write the name of the gateway method you want to use
-				'stripe'
+				'stripe', 'stripejs', 'stripev3'
 			],
 			'details' => $product_name ,
 			'ipn_url' => $this->ipn_url,
