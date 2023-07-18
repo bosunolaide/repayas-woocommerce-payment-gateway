@@ -359,13 +359,6 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		}
 	}
 
-	
-	public function redirect_to_gateway_status() {
-		wp_redirect('/gateway-status.php');
-		exit();
-	}
-
-
 	private function repayas_payment_processing( $order ) {
 
 		$identifier = strval( $order->get_id() );
