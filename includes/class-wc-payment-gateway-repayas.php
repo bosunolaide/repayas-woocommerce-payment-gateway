@@ -40,7 +40,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
 		add_filter( 'woocommerce_payment_complete_order_status', array( $this, 'change_payment_complete_order_status' ), 10, 3 );
-
+		
 		// Customer Emails.
 		add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
 	}
@@ -345,30 +345,49 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		return array_unique( array_merge( array_intersect( $this->enable_for_methods, $rate_ids ), array_intersect( $this->enable_for_methods, array_unique( array_map( 'wc_get_string_before_colon', $rate_ids ) ) ) ) );
 	}
 
-	/**
-	 * Process the payment and return the result.
-	 *
-	 * @param int $order_id Order ID.
-	 * @return array
-	 */
+   /**
+    * Process the payment and redirect to the payment gateway URL.
+    *
+    * @param int $order_id Order ID.
+    * @return array|void
+    */
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( $order->get_total() > 0 ) {
-			$this->repayas_payment_processing( $order );
-		}
+		// Make an API call to the payment gateway to obtain the payment URL
+		$payment_url = $this->get_payment_url($order);
+
+        if ($payment_url) {
+            // Redirect to the payment gateway URL
+            return array(
+                'result'   => 'success',
+                'redirect' => $payment_url
+            );
+        } else {
+            // Handle the case when payment URL retrieval fails
+            wc_add_notice('Payment URL retrieval failed. Please try again later.', 'error');
+            return;
+        }
 	}
 
-	private function repayas_payment_processing( $order ) {
+
+	/**
+     * Get the payment URL from the payment gateway API.
+     *
+     * @param WC_Order $order Order object.
+     * @return string|false Payment URL or false on failure.
+     */
+
+	private function get_payment_url( $order ) {
+
+		// Make an API call to the payment gateway to obtain the payment URL
+        // Replace this with your actual API integration code
 
 		$identifier = strval( $order->get_id() );
-		var_dump($identifier);
 
 		$currency = strval( $order->get_currency() );
-		var_dump($currency);
 
 		$amount = intval( $order->get_total() );
-		var_dump($amount);
 
 		$first_name = $order->get_billing_first_name();
 
@@ -391,7 +410,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 			'amount' => $amount,
 			'gateway_methods' => [
 				// Please write the name of the gateway method you want to use
-				'stripe'
+				'stripe', 'stripejs', 'stripev3'
 			],
 			'details' => $product_name ,
 			'ipn_url' => $this->ipn_url,
@@ -433,13 +452,12 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 
 
 		//include if condition for changing API URL from test to live.
-
-
-
+		
 		$response = wp_remote_post('https://repayas.com/test/payment/initiate', array(
 			'method' => 'POST',
 			'headers' => array(
-				'content-Type' => 'application/json; charset=utf-8'
+				'content-Type' => 'application/json; charset=utf-8',
+				'Authorization' => 'Bearer ' . $this->secret_key
 			),
 			'httpversion' => '1.0',
 			'sslverify' => false,
@@ -447,19 +465,20 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 			'timeout' => 45
 		));
 
-
-		if ( is_wp_error( $response ) ) {
-			$error_message = $response->get_error_message();
-			return "Something went wrong: $error_message";
+		// Check for API response success and extract the payment URL
+		if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+			$response_body = wp_remote_retrieve_body($response);
+            $response_data = json_decode($response_body, true);
+		
+			if (isset($response_data['redirect_url'])) {
+				return $response_data['redirect_url'];
+			}
 		}
 
-		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			$order->update_status( apply_filters( 'woocommerce_repayas_process_payment_order_status', $order->has_downloadable_item() ? 'wc-invoiced' : 'processing', $order ), __( 'Payments pending.', 'repayas-payments-woo' ) );
-		}
-
-		if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
-			$response_body = wp_remote_retrieve_body( $response );
-			var_dump($response_body);
+		return false; // Return false if payment URL retrieval fails
+	}
+			
+			/*
 			if ( 'Thank you! Your payment was successful' === $response_body) {
 				$order->payment_complete();
 
@@ -469,11 +488,11 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 				// Return thankyou redirect.
 				return array(
 					'result'   => 'success',
-					'redirect' => $this->get_return_url( $order ),
+					'redirect' => $this->get_return_url( $order ), 
 				);
-			}
-		}
-	}
+			} */
+	
+	
 
 	/**
 	 * Output for the order received page.
