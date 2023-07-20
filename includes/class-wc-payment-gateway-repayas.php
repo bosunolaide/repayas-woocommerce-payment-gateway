@@ -7,7 +7,7 @@
  *
  * @class       WC_Gateway_Repayas
  * @extends     WC_Payment_Gateway
- * @version     2.1.0
+ * @version     1.0.0
  * @package     WooCommerce/Classes/Payment
  */
 class WC_Gateway_Repayas extends WC_Payment_Gateway {

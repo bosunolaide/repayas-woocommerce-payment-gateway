@@ -5,7 +5,7 @@
  * Author: Inovidia
  * Author URI: https://inovidia.com
  * Description: Online Payment System for Merchants.
- * Version: 0.1.0
+ * Version: 1.0.0
  * License: GPL2
  * License URL: http://www.gnu.org/licenses/gpl-2.0.txt
  * text-domain: repayas-payments-woo
