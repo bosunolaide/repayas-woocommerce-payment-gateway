@@ -26,6 +26,7 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		// Get settings.
 		$this->title              = $this->get_option( 'title' );
 		$this->description        = $this->get_option( 'description' );
+		$this->test_mode          = $this->get_option('test_mode'); // Setting for test/live mode
 		$this->public_key         = $this->get_option( 'public_key' );
 		$this->secret_key         = $this->get_option( 'secret_key' );
 		$this->ipn_url            = $this->get_option( 'ipn_url' );
@@ -77,6 +78,12 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 				'default'     => __( 'Repayas', 'repayas-payments-woo' ),
 				'desc_tip'    => true,
 			),
+			'test_mode' => array( // Setting for test/live mode
+                'title'   => 'Test Mode',
+                'type'    => 'checkbox',
+                'label'   => 'Enable Test Mode',
+                'default' => 'yes'
+            ),
 			'public_key'      	=> array(
 				'title'       => __( 'Public Key', 'repayas-payments-woo' ),
 				'type'        => 'text',
@@ -354,8 +361,16 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 
+		// Determine API endpoint based on test/live mode setting
+
+		if ($this->test_mode === 'yes'){
+			$api_endpoint = 'https://repayas.com/test/payment/initiate';
+		}else{
+			$api_endpoint = 'https://repayas.com/payment/initiate';
+		}
+
 		// Make an API call to the payment gateway to obtain the payment URL
-		$payment_url = $this->get_payment_url($order);
+		$payment_url = $this->get_payment_url($order, $api_endpoint);
 
         if ($payment_url) {
             // Redirect to the payment gateway URL
@@ -375,13 +390,13 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
      * Get the payment URL from the payment gateway API.
      *
      * @param WC_Order $order Order object.
+	 * @param string $api_endpoint API endpoint URL.
      * @return string|false Payment URL or false on failure.
      */
 
-	private function get_payment_url( $order ) {
+	private function get_payment_url($order, $api_endpoint) {
 
-		// Make an API call to the payment gateway to obtain the payment URL
-        // Replace this with your actual API integration code
+		// Set parameters needed for the API
 
 		$identifier = strval( $order->get_id() );
 
@@ -449,11 +464,9 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 				'others'=>'',
 			]
 		];
-
-
-		//include if condition for changing API URL from test to live.
 		
-		$response = wp_remote_post('https://repayas.com/test/payment/initiate', array(
+		// Make an API call to the payment gateway to obtain the payment URL
+		$response = wp_remote_post($api_endpoint, array(
 			'method' => 'POST',
 			'headers' => array(
 				'content-Type' => 'application/json; charset=utf-8',
