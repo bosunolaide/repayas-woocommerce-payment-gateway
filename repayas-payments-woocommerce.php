@@ -25,6 +25,7 @@ add_action( 'plugins_loaded', 'repayas_payment_init', 11 );
 add_filter( 'woocommerce_currencies', 'inovidia_add_gbp_currencies' );
 add_filter( 'woocommerce_currency_symbol', 'inovidia_add_gbp_currencies_symbol', 10, 2 );
 add_filter( 'woocommerce_payment_gateways', 'add_to_woo_repayas_payment_gateway');
+add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'repayas_settings_link' );
 
 function repayas_payment_init() {
     if( class_exists( 'WC_Payment_Gateway' ) ) {
@@ -52,3 +53,10 @@ function inovidia_add_gbp_currencies_symbol( $currency_symbol, $currency ) {
 	}
 	return $currency_symbol;
 }
+
+function repayas_settings_link( array $links ) {
+    $url = get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=repayas";
+    $settings_link = '<a href="' . $url . '">' . __('Settings', 'textdomain') . '</a>';
+      $links[] = $settings_link;
+    return $links;
+  }
