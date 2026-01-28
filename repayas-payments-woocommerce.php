@@ -31,6 +31,7 @@ function repayas_payment_init() {
     if( class_exists( 'WC_Payment_Gateway' ) ) {
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class-wc-payment-gateway-repayas.php';
 		require_once plugin_dir_path( __FILE__ ) . '/includes/repayas-order-statuses.php';
+		require_once plugin_dir_path( __FILE__ ) . '/includes/repayas-ipn.php';
 		// require_once plugin_dir_path( __FILE__ ) . '/includes/repayas-checkout-description-fields.php';
 	}
 }
