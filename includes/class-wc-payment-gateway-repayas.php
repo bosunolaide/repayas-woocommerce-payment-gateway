@@ -30,6 +30,10 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		$this->public_key         = $this->get_option( 'public_key' );
 		$this->secret_key         = $this->get_option( 'secret_key' );
 		$this->ipn_url            = $this->get_option( 'ipn_url' );
+		if ( empty( $this->ipn_url ) && function_exists( 'WC' ) ) {
+			$this->ipn_url = WC()->api_request_url( 'repayas' );
+		}
+
 		$this->success_url        = $this->get_option( 'success_url' );
 		$this->cancel_url         = $this->get_option( 'cancel_url' );
 		$this->site_name          = $this->get_option( 'site_name' );
@@ -370,121 +374,60 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 		}
 
 		// Make an API call to the payment gateway to obtain the payment URL
-		$payment_url = $this->get_payment_url($order, $api_endpoint);
+		$logger      = function_exists( 'wc_get_logger' ) ? wc_get_logger() : null;
+		$log_context = array( 'source' => 'repayas' );
 
-        if ($payment_url) {
-            // Redirect to the payment gateway URL
-            return array(
-                'result'   => 'success',
-                'redirect' => $payment_url
-            );
-        } else {
-            // Handle the case when payment URL retrieval fails
-            wc_add_notice('Payment URL retrieval failed. Please try again later.', 'error');
-            return;
-        }
-	}
-
-
-	/**
-     * Get the payment URL from the payment gateway API.
-     *
-     * @param WC_Order $order Order object.
-	 * @param string $api_endpoint API endpoint URL.
-     * @return string|false Payment URL or false on failure.
-     */
-
-	private function get_payment_url($order, $api_endpoint) {
-
-		// Set parameters needed for the API
-
-		$identifier = strval( $order->get_id() );
-
-		$currency = strval( $order->get_currency() );
-
-		$amount = intval( $order->get_total() );
-
-		$first_name = $order->get_billing_first_name();
-
-		$last_name = $order->get_billing_last_name();
-
-		$email = $order->get_billing_email();
-
-		$mobile = $order->get_billing_phone();
-
-		foreach ( $order->get_items() as $item_id => $item ) {
-
-		$product_name = $item->get_name();	
-
-		}
-
-
-		$parameters = [
-			'identifier' => $identifier,
-			'currency' => $currency,
-			'amount' => $amount,
-			'gateway_methods' => [
-				// Please write the name of the gateway method you want to use
-				'stripe', 'stripejs'
-			],
-			'details' => $product_name ,
-			'ipn_url' => $this->ipn_url,
-			'cancel_url' => $this->cancel_url,
-			'success_url' => $this->success_url,
-			'public_key' => $this->public_key,
-			'site_name' => $this->site_name,
-			'site_logo' => $this->site_logo,
-			'checkout_theme' => 'light',
-			'customer'=>[
-				'first_name'=>$first_name,
-				'last_name'=>$last_name,
-				'email'=>$email,
-				'mobile'=>$mobile,
-			],
-			'shipping_info'=>[
-				'address_one'=>'',
-				'address_two'=>'',
-				'area'=>'',
-				'city'=>'',
-				'sub_city'=>'',
-				'state'=>'',
-				'postcode'=>'',
-				'country'=>'',
-				'others'=>'',
-			],
-			'billing_info'=>[
-				'address_one'=>'',
-				'address_two'=>'',
-				'area'=>'',
-				'city'=>'',
-				'sub_city'=>'',
-				'state'=>'',
-				'postcode'=>'',
-				'country'=>'',
-				'others'=>'',
-			]
-		];
-		
-		// Make an API call to the payment gateway to obtain the payment URL
-		$response = wp_remote_post($api_endpoint, array(
-			'method' => 'POST',
-			'headers' => array(
-				'content-Type' => 'application/json; charset=utf-8',
-				'Authorization' => 'Bearer ' . $this->secret_key
+		$args = array(
+			'method'      => 'POST',
+			'headers'     => array(
+				'Content-Type'  => 'application/json; charset=utf-8',
+				'Authorization' => 'Bearer ' . $this->secret_key,
 			),
 			'httpversion' => '1.0',
-			'sslverify' => false,
-			'body' => json_encode($parameters),
-			'timeout' => 45
-		));
+			'sslverify'   => true,
+			'body'        => wp_json_encode( $parameters ),
+			'timeout'     => 45,
+		);
 
-		// Check for API response success and extract the payment URL
-		if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
-			$response_body = wp_remote_retrieve_body($response);
-            $response_data = json_decode($response_body, true);
-		
-			if (isset($response_data['redirect_url'])) {
-				return $response_data['redirect_url'];
+		if ( $logger ) {
+			$logger->info( 'Sending Repayas initiate request: ' . print_r( $parameters, true ), $log_context );
+		}
+
+		$response = wp_remote_post( $api_endpoint, $args );
+
+		if ( is_wp_error( $response ) ) {
+			if ( $logger ) {
+				$logger->error( 'Repayas initiate request failed: ' . $response->get_error_message(), $log_context );
+			}
+			return false;
+		}
+
+		$code         = wp_remote_retrieve_response_code( $response );
+		$response_body = wp_remote_retrieve_body( $response );
+		$data          = json_decode( $response_body, true );
+
+		if ( $logger ) {
+			$logger->info( 'Repayas initiate response (' . $code . '): ' . $response_body, $log_context );
+		}
+
+		if ( 200 !== $code || ! is_array( $data ) ) {
+			return false;
+		}
+
+		// Try a few common keys where a redirect/payment URL might live.
+		$possible_keys = array( 'redirect_url', 'url', 'payment_url', 'payment_link' );
+		foreach ( $possible_keys as $key ) {
+			if ( isset( $data[ $key ] ) && ! empty( $data[ $key ] ) ) {
+				return esc_url_raw( $data[ $key ] );
+			}
+		}
+
+		// Some APIs nest the URL under a 'data' object.
+		if ( isset( $data['data'] ) && is_array( $data['data'] ) ) {
+			foreach ( $possible_keys as $key ) {
+				if ( isset( $data['data'][ $key ] ) && ! empty( $data['data'][ $key ] ) ) {
+					return esc_url_raw( $data['data'][ $key ] );
+				}
 			}
 		}
 
@@ -527,10 +470,13 @@ class WC_Gateway_Repayas extends WC_Payment_Gateway {
 	 */
 	public function change_payment_complete_order_status( $status, $order_id = 0, $order = false ) {
 		if ( $order && 'repayas' === $order->get_payment_method() ) {
-			$status = 'completed';
+			// If you prefer a different post-payment status, replace 'invoiced' with 'completed' or 'processing'.
+			$status = 'invoiced';
 		}
 		return $status;
 	}
+
+	/**}
 
 	/**
 	 * Add content to the WC emails.
